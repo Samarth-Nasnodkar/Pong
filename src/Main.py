@@ -1,3 +1,4 @@
+from inspect import isroutine
 import pygame
 from libs.vectors import Vector2
 from random import randint
@@ -41,7 +42,8 @@ class Game:
         if self.ballPosition.x >= self.height * 0.75:
             return
 
-        pitchLength = int(self.ballVelocity.y * self.ballPosition.x / self.ballVelocity.x)
+        pitchLength = int(self.ballVelocity.y *
+                          self.ballPosition.x / self.ballVelocity.x)
         finalCoord = self.aiPosition.y
         if self.ballVelocity.y >= 0:
             finalCoord = self.ballPosition.y + pitchLength
@@ -77,11 +79,13 @@ class Game:
             startH += H + 10
 
     def eventLoop(self):
+        score = 0
         while self.isRunning:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     self.isRunning = False
+                    return
             key = pygame.key.get_pressed()
             if key[pygame.K_w] or key[pygame.K_UP]:
                 self.playerPosition -= self.playerVelocity
@@ -93,9 +97,9 @@ class Game:
                     self.playerPosition.y = self.height - 80
 
             self.ballPosition += self.ballVelocity
-            if self.ballPosition.x + 15 >= self.width:
-                self.ballPosition.x = self.width - 15
-                self.ballVelocity.x *= -1
+            # if self.ballPosition.x + 15 >= self.width:
+            #     self.ballPosition.x = self.width - 15
+            #     self.ballVelocity.x *= -1
             # if self.ballPosition.x <= 0:
             #     self.ballPosition.x = 0
             #     self.ballVelocity.x *= -1
@@ -107,6 +111,12 @@ class Game:
                 self.ballVelocity.y *= -1
             if self.width - 7 <= self.ballPosition.x + 7.5 <= self.width and self.playerPosition.y <= self.ballPosition.y + 7.5 <= self.playerPosition.y + 80:
                 self.ballVelocity.x *= -1
+                score += 1
+            if self.width - 7 <= self.ballPosition.x + 7.5 <= self.width and not (self.playerPosition.y <= self.ballPosition.y + 7.5 <= self.playerPosition.y + 80):
+                print('Game Ended, Score = {}'.format(score))
+                pygame.quit()
+                self.isRunning = False
+                return
             if self.ballPosition.x <= 7 and self.aiPosition.y <= self.ballPosition.y + 7.5 <= self.aiPosition.y + 80:
                 self.ballPosition.x = 7
                 self.ballVelocity.x *= -1
